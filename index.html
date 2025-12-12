@@ -790,23 +790,33 @@
                 let newCats = [];
                 
                 // The Cat API
-                if (state.currentApi === 'thecatapi') {
-                    try {
-                        const response = await fetch(`https://api.thecatapi.com/v1/images/search?limit=${count}&size=small&mime_types=jpg,png`);
-                        if (!response.ok) throw new Error('Ошибка TheCatAPI');
-                        const data = await response.json();
-                        
-                        newCats = data.map(cat => ({
-                            url: cat.url,
-                            tags: [],
-                            id: cat.id,
-                            source: 'thecatapi'
-                        }));
-                    } catch (error) {
-                        console.warn('The Cat API недоступен, используем запасной вариант');
-                        newCats = generateFallbackCats(count);
-                    }
-                } 
+if (state.currentApi === 'thecatapi') {
+    try {
+        // Используем CORS прокси
+        const proxyUrl = 'https://corsproxy.io/?';
+        const apiUrl = `https://api.thecatapi.com/v1/images/search?limit=${count}&size=med&mime_types=jpg,png`;
+        
+        const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+        if (!response.ok) throw new Error('Ошибка TheCatAPI');
+        const data = await response.json();
+        
+        newCats = data.map(cat => ({
+            url: cat.url,
+            tags: [],
+            id: cat.id,
+            source: 'thecatapi'
+        }));
+    } catch (error) {
+        console.warn('The Cat API недоступен, используем CATAAS как запасной');
+        // Автоматически переключаемся на CATAAS
+        state.currentApi = 'cataas';
+        const apiSelect = document.getElementById('api-source');
+        if (apiSelect) apiSelect.value = 'cataas';
+        return fetchCatsFromApi(count, append); // Рекурсивно вызываем с CATAAS
+    }
+}
+
+                    
                 // CATAAS API
                 else {
                     try {
