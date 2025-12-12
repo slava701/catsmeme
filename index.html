@@ -752,13 +752,15 @@
         let debounceTimer;
         
         // Инициализация
-        initTemplates();
-        setupInfiniteScroll();
-        initCatLibrary();
-        setupEventListeners();
-        fetchCatsFromApi(24);
-        updateUI();
-        drawMeme();
+document.addEventListener('DOMContentLoaded', function() {
+    initTemplates();
+    setupInfiniteScroll();
+    initCatLibrary();
+    setupEventListeners();
+    fetchCatsFromApi(24);
+    updateUI();
+    drawMeme();
+});
         
         // Инициализация шаблонов
         function initTemplates() {
